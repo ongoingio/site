@@ -1,0 +1,7 @@
+{
+	"repository": "https://api.github.com/repos/ongoingio/examples/",
+	"ignore": [
+		".gitignore",
+		"README.md"
+	]
+}

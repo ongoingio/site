@@ -1,5 +1,4 @@
-{{ define "layout" }}
-<!doctype html>
+{{ define "layout" }}<!doctype html>
 <html class="no-js" lang="en">
 <head>
     <meta charset="utf-8">
@@ -7,9 +6,28 @@
     <title></title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../public/bower_components/normalize-css/normalize.css">
+    <link rel="stylesheet" href="../public/styles.css">
+    <link rel="stylesheet" href="../public/bower_components/font-awesome/css/font-awesome.min.css">
+    <!--<link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,300,500,700">-->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=RobotoDraft:400,500,700,400italic">
 </head>
 <body>
-    {{ template "content" }}
+	
+	<header class="header">
+		<h1 class="header-title">{{ template "title" . }}</h1>
+		<ul class="header-meta">
+			<li class="header-meta-item"><a href="" class="header-meta-button"><i class="fa fa-fw fa-search"></i></a></li>
+			<li class="header-meta-item"><a href="" class="header-meta-button"><i class="fa fa-fw fa-question"></i></a></li>
+		</ul>
+	</header>	
+
+	<div class="container">
+		{{ template "content" . }}
+	</div>
+
+	<div class="action"><a href="https://github.com/ongoingio/examples" class="action-button"><i class="fa fa-plus"></i></a></div>
+	<div class="action-info"><i class="fa fa-github"></i></div>
+	
 </body>
-</html>
-{{ end }}
+</html>{{ end }}

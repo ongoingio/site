@@ -1,0 +1,16 @@
+{{ define "title" }}
+	<a href="/" class="header-button"><i class="fa fa-fw fa-chevron-left header-icon"></i></a> {{ .Name }}
+{{ end }}
+
+{{ define "content" }}
+    <div class="subheader">
+		<ul class="subheader-items">
+			<li class="subheader-item"><a href="#" class="subheader-button"><i class="fa fa-fw fa-sort-amount-desc"></i></a></li>
+			<li class="subheader-item"><a href="#" class="subheader-button is-active"><i class="fa fa-fw fa-file"></i></a></li>
+			<li class="subheader-item"><a href="#" class="subheader-button is-active"><i class="fa fa-fw fa-folder"></i></a></li>
+		</ul>
+	</div>		
+	<div class="content">
+	    {{ .Content }}
+	</div>
+{{ end }}
