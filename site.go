@@ -5,6 +5,8 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/ongoingio/site/app/database"
+	"github.com/ongoingio/site/app/examples"
 	"github.com/ongoingio/site/app/handlers"
 )
 
@@ -22,6 +24,11 @@ func init() {
 */
 
 func main() {
+	database.Connect()
+
+	examples.Register()
+	examples.Sync()
+
 	router := httprouter.New()
 	router.GET("/", handlers.List)
 	router.GET("/examples/:alias", handlers.Show)

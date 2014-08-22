@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"text/template"
 
-	"github.com/ongoingio/site/app/model"
+	"github.com/ongoingio/site/app/examples"
 )
 
 // List shows a list of all available examples.
@@ -14,5 +14,5 @@ func List(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	if err != nil {
 		panic(err)
 	}
-	t.ExecuteTemplate(w, "layout", model.List())
+	t.ExecuteTemplate(w, "layout", examples.List())
 }

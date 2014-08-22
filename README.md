@@ -19,3 +19,6 @@
 * Layout/parent template
 * Decode JSON starting with an array, when the number of objects is unknown.
 * Models in Go
+* Unmarshal a JSON array or unknown length into a slice.
+* Database connection best practice.
+* Testing an external API (like Github).
