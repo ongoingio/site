@@ -1,21 +1,27 @@
 // TODO: Ignore ignored files.
-// TODO: Handle folders differently.
+// TODO: Handle folders (and symlinks?) differently.
+//
+// Usage:
+//     examples.Register({ db: session })
+//
+//
 
 package examples
 
 import (
-	_"fmt"
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 	"log"
 	"net/url"
+
+	"gopkg.in/mgo.v2/bson"
 
 	"github.com/ongoingio/site/app/database"
 	"github.com/ongoingio/site/app/repository"
 )
 
+// TODO: "gopkg.in/mgo.v2" gets auto-removed by goimports.
 var collection *mgo.Collection
 
+// Example represents an Example.
 type Example struct {
 	Path        string
 	Type        string
@@ -51,6 +57,7 @@ func generateAlias(name string) string {
 	return url.QueryEscape(name)
 }
 
+// Save saves an example.
 func (example *Example) Save() error {
 	err := collection.Insert(example)
 	if err != nil {
@@ -60,6 +67,7 @@ func (example *Example) Save() error {
 	return nil
 }
 
+// UpdateByPath updates an example with the given path.
 func (example *Example) UpdateByPath(path string) error {
 	colQuerier := bson.M{"path": path}
 	change := bson.M{"$set": example}
@@ -71,7 +79,8 @@ func (example *Example) UpdateByPath(path string) error {
 	return nil
 }
 
-func (example *Example) Prepare(content repository.RepositoryContent) error {
+// Prepare prepares the example with additional content.
+func (example *Example) Prepare(content repository.Content) error {
 	example.Type = content.Type
 	example.Alias = generateAlias(content.Name)
 	example.Name = content.Name
@@ -82,7 +91,7 @@ func (example *Example) Prepare(content repository.RepositoryContent) error {
 	example.Description = "Some description..."
 
 	// TODO: Prepare() in goroutine.
-	err := content.FetchContent()
+	err := content.Fetch()
 	if err != nil {
 		return err
 	}
@@ -91,9 +100,10 @@ func (example *Example) Prepare(content repository.RepositoryContent) error {
 	return nil
 }
 
+// Sync synchronizes the database with the Github repository.
 func Sync() error {
 	repo := repository.New("https://api.github.com/repos/ongoingio/examples/")
-	repoContent, err := repo.FetchRepository()
+	repoContent, err := repo.Fetch()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -122,6 +132,7 @@ func Sync() error {
 	return nil
 }
 
+// Register registers the database collection.
 func Register() {
 	collection = database.Session.DB("ongoingio").C("examples")
 }

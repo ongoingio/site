@@ -1,9 +1,10 @@
 package main
 
 import (
-	"github.com/julienschmidt/httprouter"
 	"log"
 	"net/http"
+
+	"github.com/julienschmidt/httprouter"
 
 	"github.com/ongoingio/site/app/database"
 	"github.com/ongoingio/site/app/examples"
