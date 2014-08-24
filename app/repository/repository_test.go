@@ -14,13 +14,13 @@ func createServer() *httptest.Server {
 		var err error
 
 		switch r.URL.String() {
-		case "/contents":
-			content, err = ioutil.ReadFile("./test/repository.json")
+		case "/":
+			content, err = ioutil.ReadFile("./test/dir.json")
 			if err != nil {
 				panic(err)
 			}
-		case "/gobble":
-			content, err = ioutil.ReadFile("./test/content.json")
+		case "/file":
+			content, err = ioutil.ReadFile("./test/file.json")
 			if err != nil {
 				panic(err)
 			}
@@ -35,33 +35,40 @@ func createServer() *httptest.Server {
 	return ts
 }
 
-func TestFetchRepository(t *testing.T) {
+func TestFetchDir(t *testing.T) {
 	ts := createServer()
 	defer ts.Close()
 
 	repo := New(ts.URL)
-	err := repo.Fetch()
+	content, contents, err := repo.Fetch("/")
 	if err != nil {
 		t.Fatalf("Fetch(): %v", err)
 	}
 
-	if repo.Content[0].Name != ".gitignore" {
-		t.Fatalf("name of first file should be %s, is %s", ".gitignore", repo.Content[0].Name)
+	if content != nil {
+		t.Fatalf("content should be nil, is %s", content)
+	}
+
+	if contents[0].Name != ".gitignore" {
+		t.Fatalf("name of first file should be %s, is %s", ".gitignore", contents[0].Name)
 	}
 }
 
-func TestFetchContent(t *testing.T) {
+func TestFetchFile(t *testing.T) {
 	ts := createServer()
 	defer ts.Close()
 
-	content := &Content{URL: ts.URL + "/gobble"}
-
-	err := content.Fetch()
+	repo := New(ts.URL)
+	content, contents, err := repo.Fetch("/file")
 	if err != nil {
 		t.Fatalf("Fetch(): %v", err)
 	}
 
-	if content.Content != "Just a test!" {
-		t.Fatalf("content should be %s, is %s", "Just a test!", content.Content)
+	if contents != nil {
+		t.Fatalf("contents should be nil, is %s", contents)
+	}
+
+	if content.Name != "README.md" {
+		t.Fatalf("name of file should be %s, is %s", "README.md", content.Name)
 	}
 }
