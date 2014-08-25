@@ -1,28 +1,27 @@
+// TODO: Tests require consecutive order. Make them independent.
+
 package examples
 
 import (
 	"testing"
 
-	"gopkg.in/mgo.v2"
+	_ "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
+
+	"github.com/ongoingio/site/app/database"
 )
 
 func TestInsert(t *testing.T) {
-	// TODO: Create a new session in every test?
-	// TODO: Refactor out into function
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err)
-	}
-
-	db := session.DB("ongoing-test")
-	Register(db)
+	db := database.Connect("localhost/ongoing-test")
+	defer db.Session.Close()
 
 	// Drop database
-	err = session.DB("ongoing-test").DropDatabase()
+	err := db.DropDatabase()
 	if err != nil {
 		panic(err)
 	}
+
+	Register(db)
 
 	// TODO: M doesn't make sense.
 	M.Insert(&Example{
@@ -43,14 +42,10 @@ func TestInsert(t *testing.T) {
 	}
 }
 
-// TODO: Tests require the insert first. Make them all independent?
 func TestFindOne(t *testing.T) {
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err)
-	}
+	db := database.Connect("localhost/ongoing-test")
+	defer db.Session.Close()
 
-	db := session.DB("ongoing-test")
 	Register(db)
 
 	search := &Example{Name: "Foo.bar"}
@@ -63,12 +58,9 @@ func TestFindOne(t *testing.T) {
 }
 
 func TestFindAll(t *testing.T) {
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err)
-	}
+	db := database.Connect("localhost/ongoing-test")
+	defer db.Session.Close()
 
-	db := session.DB("ongoing-test")
 	Register(db)
 
 	var results []Example
@@ -81,12 +73,9 @@ func TestFindAll(t *testing.T) {
 }
 
 func TestUpdate(t *testing.T) {
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err)
-	}
+	db := database.Connect("localhost/ongoing-test")
+	defer db.Session.Close()
 
-	db := session.DB("ongoing-test")
 	Register(db)
 
 	doc := &Example{Name: "Baz", Path: "Foo.bar"}
@@ -95,7 +84,7 @@ func TestUpdate(t *testing.T) {
 
 	result := Example{}
 	// TODO: Store collection name in model. Is currently hardcoded.
-	err = db.C("examples").Find(bson.M{"path": "Foo.bar"}).One(&result)
+	err := db.C("examples").Find(bson.M{"path": "Foo.bar"}).One(&result)
 	if err != nil {
 		t.Fatalf("error in mgo: %v", err)
 	}
@@ -106,15 +95,12 @@ func TestUpdate(t *testing.T) {
 }
 
 func TestRemove(t *testing.T) {
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err)
-	}
+	db := database.Connect("localhost/ongoing-test")
+	defer db.Session.Close()
 
-	db := session.DB("ongoing-test")
 	Register(db)
 
-	err = M.Remove(&Example{Path: "Foo.bar"})
+	err := M.Remove(&Example{Path: "Foo.bar"})
 	if err != nil {
 		panic(err)
 	}
