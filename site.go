@@ -25,7 +25,7 @@ func init() {
 */
 
 func main() {
-	database.Connect()
+	session := database.Connect()
 
 	examples.Register()
 	examples.Sync()

@@ -1,82 +1,11 @@
 // TODO: Ignore ignored files.
 // TODO: Handle folders (and symlinks?) differently.
-//
-// Usage:
-//     examples.Register({ db: session })
-//
-//
 
-package examples
-
-import (
-	"log"
-	"net/url"
-
-	"gopkg.in/mgo.v2/bson"
-
-	"github.com/ongoingio/site/app/database"
-	"github.com/ongoingio/site/app/repository"
-)
-
-// TODO: "gopkg.in/mgo.v2" gets auto-removed by goimports.
-var collection *mgo.Collection
-
-// Example represents an Example.
-type Example struct {
-	Path        string
-	Type        string
-	Alias       string
-	Name        string
-	SHA         string
-	Description string
-	Content     string
-}
-
-/*
-// TODO: Possible to List() as a method?
-func List() []Example {
-	return data
-}
-*/
-
-/*
-// TODO: Return a pointer or an error? Most ORM seem to be using `err := Find(&example, "name-1")`
-func FindByName(name string) (Example, error) {
-	for _, e := range data {
-		if e.Name == name {
-			return e, nil
-		}
-	}
-
-	return Example{}, fmt.Errorf("%s not found", name)
-}
-*/
+package sync
 
 // TODO: Method on Examples or Example?
 func generateAlias(name string) string {
 	return url.QueryEscape(name)
-}
-
-// Save saves an example.
-func (example *Example) Save() error {
-	err := collection.Insert(example)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// UpdateByPath updates an example with the given path.
-func (example *Example) UpdateByPath(path string) error {
-	colQuerier := bson.M{"path": path}
-	change := bson.M{"$set": example}
-	err := collection.Update(colQuerier, change)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 // Prepare prepares the example with additional content.
@@ -130,9 +59,4 @@ func Sync() error {
 	}
 
 	return nil
-}
-
-// Register registers the database collection.
-func Register() {
-	collection = database.Session.DB("ongoingio").C("examples")
 }

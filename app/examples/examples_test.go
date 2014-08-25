@@ -1,72 +1,121 @@
-// Examples depends on two services: the database session and a repository (interface).
-// It probably is best to both inject them when the example model is created.
-
 package examples
 
 import (
 	"testing"
 
-	"github.com/ongoingio/site/app/repository"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
-/*
-var contentMock1 = repository.Content{
-	Type:     "file",
-	Encoding: "base64",
-	Name:     "README.md",
-	Path:     "README.md",
-	Content:  "R28gRXhhbXBsZXMKPT09PT09PT0KCkFuIGV4YW1wbGUgYSBkYXksIGtlZXBz\nIHRoZSBmcnVzdHJhdGlvbiBhd2F5Lgo=\n",
-	SHA:      "7962fa277d1c99417188f9fafe5ac3d575b22133",
-	URL:      "https://api.github.com/repos/ongoingio/examples/contents/README.md?ref=master",
-}
-*/
+func TestInsert(t *testing.T) {
+	// TODO: Create a new session in every test?
+	// TODO: Refactor out into function
+	session, err := mgo.Dial("localhost")
+	if err != nil {
+		panic(err)
+	}
 
-type repositoryMock struct {
-	repository.Repository
-}
+	db := session.DB("ongoing-test")
+	Register(db)
 
-type contentMock struct {
-	repository.Content
-}
+	// Drop database
+	err = session.DB("ongoing-test").DropDatabase()
+	if err != nil {
+		panic(err)
+	}
 
-func (repo *repositoryMock) Fetch() {
-	/*
-		content := &contentMock{
-			Type:     "file",
-			Encoding: "base64",
-			Name:     "README.md",
-			Path:     "README.md",
-			SHA:      "7962fa277d1c99417188f9fafe5ac3d575b22133",
-			URL:      "https://api.github.com/repos/ongoingio/examples/contents/README.md?ref=master",
-		}
-		contents := make([]contentMock, 1)
-		contents[0] = content
-		repos = &repository.Repository{URL: "foo/bar", Content: contents}
-	*/
-}
+	// TODO: M doesn't make sense.
+	M.Insert(&Example{
+		Path:    "Foo.bar",
+		Name:    "Foo.bar",
+		Content: "Foo bar baz [...]",
+	})
 
-func (content *contentMock) Fetch() {
-	/*
-		content = &contentMock{
-			Type:     "file",
-			Encoding: "base64",
-			Name:     "README.md",
-			Path:     "README.md",
-			Content:  "Content goes here...",
-			SHA:      "7962fa277d1c99417188f9fafe5ac3d575b22133",
-			URL:      "https://api.github.com/repos/ongoingio/examples/contents/README.md?ref=master",
-		}
-	*/
+	result := Example{}
+	// TODO: Store collection name in model. Is currently hardcoded.
+	err = db.C("examples").Find(bson.M{"path": "Foo.bar"}).One(&result)
+	if err != nil {
+		t.Fatalf("error in mgo: %v", err)
+	}
+
+	if result.Name != "Foo.bar" {
+		t.Fatalf("name should be %s, is %s", "Foo.bar", result.Name)
+	}
 }
 
-func TestSync(t *testing.T) {
-	// TODO: Create database session.
+// TODO: Tests require the insert first. Make them all independent?
+func TestFindOne(t *testing.T) {
+	session, err := mgo.Dial("localhost")
+	if err != nil {
+		panic(err)
+	}
 
-	repository := &repositoryMock{repository.Repository{
-		URL:     "foo/bar",
-		Content: []contentMock{},
-	}}
+	db := session.DB("ongoing-test")
+	Register(db)
 
-	Register(session, repository)
-	Sync()
+	search := &Example{Name: "Foo.bar"}
+	M.FindOne(search)
+	// TODO: Handle error.
+
+	if search.Path != "Foo.bar" {
+		t.Fatalf("path should be %s, is %s", "Foo.bar", search.Path)
+	}
+}
+
+func TestFindAll(t *testing.T) {
+	session, err := mgo.Dial("localhost")
+	if err != nil {
+		panic(err)
+	}
+
+	db := session.DB("ongoing-test")
+	Register(db)
+
+	var results []Example
+	M.FindAll(&results)
+	// TODO: Handle error
+
+	if results[0].Name != "Foo.bar" {
+		t.Fatalf("name of first should be %s, is %s", "Foo.bar", results[0].Name)
+	}
+}
+
+func TestUpdate(t *testing.T) {
+	session, err := mgo.Dial("localhost")
+	if err != nil {
+		panic(err)
+	}
+
+	db := session.DB("ongoing-test")
+	Register(db)
+
+	doc := &Example{Name: "Baz", Path: "Foo.bar"}
+	M.Update(doc)
+	// TODO: Handle error
+
+	result := Example{}
+	// TODO: Store collection name in model. Is currently hardcoded.
+	err = db.C("examples").Find(bson.M{"path": "Foo.bar"}).One(&result)
+	if err != nil {
+		t.Fatalf("error in mgo: %v", err)
+	}
+
+	if result.Name != "Baz" {
+		t.Fatalf("name should be %s, is %s", "Baz", result.Name)
+	}
+}
+
+func TestRemove(t *testing.T) {
+	session, err := mgo.Dial("localhost")
+	if err != nil {
+		panic(err)
+	}
+
+	db := session.DB("ongoing-test")
+	Register(db)
+
+	err = M.Remove(&Example{Path: "Foo.bar"})
+	if err != nil {
+		panic(err)
+	}
 }
