@@ -7,8 +7,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// ManagerInterface defines the interface
-type ManagerInterface interface {
+//RepositoryInterface defines the interface
+type RepositoryInterface interface {
 	Insert(example *Example) error
 	FindOne(example *Example) error
 	FindAll(examples *[]Example) error
@@ -16,8 +16,8 @@ type ManagerInterface interface {
 	Remove(example *Example) error
 }
 
-// Manager TODO: Describe
-type manager struct {
+// Repository TODO: Describe
+type repository struct {
 	Collection *mgo.Collection
 }
 
@@ -33,7 +33,7 @@ type Example struct {
 }
 
 // Insert creates a new example in the collection.
-func (m *manager) Insert(example *Example) error {
+func (m *repository) Insert(example *Example) error {
 	err := m.Collection.Insert(example)
 	if err != nil {
 		return err
@@ -43,7 +43,7 @@ func (m *manager) Insert(example *Example) error {
 }
 
 // FindOne finds one document in the collection.
-func (m *manager) FindOne(example *Example) error {
+func (m *repository) FindOne(example *Example) error {
 	// TODO: Why does a struct to Select work, but directly to Find (without Select) not?
 	err := m.Collection.Find(nil).Select(example).One(example)
 	if err != nil {
@@ -54,7 +54,7 @@ func (m *manager) FindOne(example *Example) error {
 }
 
 // FindAll finds all documents in the collection.
-func (m *manager) FindAll(examples *[]Example) error {
+func (m *repository) FindAll(examples *[]Example) error {
 	// TODO: Why does a struct to Select work, but directly to Find (without Select) not?
 	err := m.Collection.Find(nil).All(examples)
 	if err != nil {
@@ -65,7 +65,7 @@ func (m *manager) FindAll(examples *[]Example) error {
 }
 
 // Update an existing example.
-func (m *manager) Update(example *Example) error {
+func (m *repository) Update(example *Example) error {
 	query := bson.M{"path": example.Path}
 	err := m.Collection.Update(query, example)
 	if err != nil {
@@ -76,7 +76,7 @@ func (m *manager) Update(example *Example) error {
 }
 
 // Remove an example from the collection.
-func (m *manager) Remove(example *Example) error {
+func (m *repository) Remove(example *Example) error {
 	query := bson.M{"path": example.Path}
 	err := m.Collection.Remove(query)
 	if err != nil {
@@ -87,6 +87,6 @@ func (m *manager) Remove(example *Example) error {
 }
 
 // New returns a new manager.
-func New(db *mgo.Database) *manager {
-	return &manager{Collection: db.C("examples")}
+func New(db *mgo.Database) *repository {
+	return &repository{Collection: db.C("examples")}
 }
