@@ -5,14 +5,14 @@ import (
 
 	"github.com/ongoingio/site/app/database"
 	"github.com/ongoingio/site/app/examples"
-	"github.com/ongoingio/site/app/repository"
+	"github.com/ongoingio/site/app/github"
 )
 
-type repositoryMock struct {
+type githubMock struct {
 	URL string
 }
 
-func (repo *repositoryMock) Fetch(path string) (*repository.Content, []*repository.Content, error) {
+func (repo *githubMock) Fetch(path string) (*github.Content, []*github.Content, error) {
 	/*
 	   content := &contentMock{
 	       Type:     "file",
@@ -39,7 +39,7 @@ func TestSyncNew(t *testing.T) {
 	}
 
 	// Repository
-	repo := &repositoryMock{
+	repo := &githubMock{
 		URL: "/foo",
 	}
 

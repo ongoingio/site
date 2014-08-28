@@ -8,7 +8,7 @@
 //     content, contents, err := repo.Fetch("root/or/path")
 //
 
-package repository
+package github
 
 import (
 	"encoding/base64"

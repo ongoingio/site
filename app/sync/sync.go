@@ -9,7 +9,7 @@ import (
 	"gopkg.in/mgo.v2"
 
 	"github.com/ongoingio/site/app/examples"
-	"github.com/ongoingio/site/app/repository"
+	"github.com/ongoingio/site/app/github"
 )
 
 // TODO: Method on Examples or Example?
@@ -17,7 +17,7 @@ func generateAlias(name string) string {
 	return url.QueryEscape(name)
 }
 
-func prepare(repo repository.Fetcher, content *repository.Content) (*examples.Example, error) {
+func prepare(repo github.Fetcher, content *github.Content) (*examples.Example, error) {
 	example := &examples.Example{
 		Type:  content.Type,
 		Alias: generateAlias(content.Name),
@@ -37,7 +37,7 @@ func prepare(repo repository.Fetcher, content *repository.Content) (*examples.Ex
 }
 
 // Sync synchronizes the database with the Github repository.
-func Sync(repo repository.Fetcher, manager examples.RepositoryInterface) error {
+func Sync(repo github.Fetcher, manager examples.RepositoryInterface) error {
 	_, contents, err := repo.Fetch("/")
 	if err != nil {
 		return err
