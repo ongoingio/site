@@ -44,12 +44,9 @@ func TestSyncNew(t *testing.T) {
 	}
 
 	// Model
-	examples.Register(db)
+	manager := examples.New(db)
 
-	// TODO: Refactor to use DI and not "global" M *Manager
-	m := examples.M
-
-	err = Sync(repo, m)
+	err = Sync(repo, manager)
 	if err != nil {
 		t.Fatalf("Sync(): %v", err)
 	}

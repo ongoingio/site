@@ -7,11 +7,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// M holds an instance of Manager.
-// TODO: Use dependency injection instead?
-var M *Manager
-
-// Manager does bla.
+// Manager TODO: Describe
 type Manager struct {
 	Collection *mgo.Collection
 }
@@ -81,7 +77,7 @@ func (m *Manager) Remove(example *Example) error {
 	return nil
 }
 
-// Register a new model.
-func Register(db *mgo.Database) {
-	M = &Manager{Collection: db.C("examples")}
+// New returns a new manager.
+func New(db *mgo.Database) *Manager {
+	return &Manager{Collection: db.C("examples")}
 }

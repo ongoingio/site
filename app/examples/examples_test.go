@@ -21,10 +21,10 @@ func TestInsert(t *testing.T) {
 		panic(err)
 	}
 
-	Register(db)
+	manager := New(db)
 
 	// TODO: M doesn't make sense.
-	M.Insert(&Example{
+	manager.Insert(&Example{
 		Path:    "Foo.bar",
 		Name:    "Foo.bar",
 		Content: "Foo bar baz [...]",
@@ -46,10 +46,10 @@ func TestFindOne(t *testing.T) {
 	db := database.Connect("localhost/ongoing-test")
 	defer db.Session.Close()
 
-	Register(db)
+	manager := New(db)
 
 	search := &Example{Name: "Foo.bar"}
-	M.FindOne(search)
+	manager.FindOne(search)
 	// TODO: Handle error.
 
 	if search.Path != "Foo.bar" {
@@ -61,10 +61,10 @@ func TestFindAll(t *testing.T) {
 	db := database.Connect("localhost/ongoing-test")
 	defer db.Session.Close()
 
-	Register(db)
+	manager := New(db)
 
 	var results []Example
-	M.FindAll(&results)
+	manager.FindAll(&results)
 	// TODO: Handle error
 
 	if results[0].Name != "Foo.bar" {
@@ -76,10 +76,10 @@ func TestUpdate(t *testing.T) {
 	db := database.Connect("localhost/ongoing-test")
 	defer db.Session.Close()
 
-	Register(db)
+	manager := New(db)
 
 	doc := &Example{Name: "Baz", Path: "Foo.bar"}
-	M.Update(doc)
+	manager.Update(doc)
 	// TODO: Handle error
 
 	result := Example{}
@@ -98,9 +98,9 @@ func TestRemove(t *testing.T) {
 	db := database.Connect("localhost/ongoing-test")
 	defer db.Session.Close()
 
-	Register(db)
+	manager := New(db)
 
-	err := M.Remove(&Example{Path: "Foo.bar"})
+	err := manager.Remove(&Example{Path: "Foo.bar"})
 	if err != nil {
 		panic(err)
 	}
