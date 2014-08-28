@@ -1,7 +1,7 @@
 // Repository package is a service to get content from a Github repository.
 //
-// TODO:
-// * Rename /repository to /services?
+// TODO: Rename /repository to /services?
+// TODO: Could the repository just be another store/gateway? And sync an adapter between the two stores with the same interface?
 //
 // Usage:
 //     repo := repository.New("http://url")
