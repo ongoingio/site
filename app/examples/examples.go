@@ -7,7 +7,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// M
+// M holds an instance of Manager.
+// TODO: Use dependency injection instead?
 var M *Manager
 
 // Manager does bla.

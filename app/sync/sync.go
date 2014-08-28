@@ -3,58 +3,78 @@
 
 package sync
 
+import (
+	"net/url"
+
+	"gopkg.in/mgo.v2"
+
+	"github.com/ongoingio/site/app/examples"
+	"github.com/ongoingio/site/app/repository"
+)
+
 // TODO: Method on Examples or Example?
 func generateAlias(name string) string {
 	return url.QueryEscape(name)
 }
 
-// Prepare prepares the example with additional content.
-func (example *Example) Prepare(content repository.Content) error {
-	example.Type = content.Type
-	example.Alias = generateAlias(content.Name)
-	example.Name = content.Name
-	example.SHA = content.SHA
-	example.Path = content.Path
-
-	// TODO: Extract description from file (via parse package).
-	example.Description = "Some description..."
+func prepare(repo repository.Fetcher, content *repository.Content) (*examples.Example, error) {
+	example := &examples.Example{
+		Type:  content.Type,
+		Alias: generateAlias(content.Name),
+		Name:  content.Name,
+		SHA:   content.SHA,
+		Path:  content.Path,
+	}
 
 	// TODO: Prepare() in goroutine.
-	err := content.Fetch()
+	c, _, err := repo.Fetch(content.Path)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	example.Content = content.Content
+	example.Content = c.Content
 
-	return nil
+	return example, nil
 }
 
 // Sync synchronizes the database with the Github repository.
-func Sync() error {
-	repo := repository.New("https://api.github.com/repos/ongoingio/examples/")
-	repoContent, err := repo.Fetch()
+func Sync(repo repository.Fetcher, manager *examples.Manager) error {
+	_, contents, err := repo.Fetch("/")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	for _, content := range repoContent.Content {
-		result := Example{}
-		err = collection.Find(bson.M{"path": content.Path}).One(&result)
+	for _, c := range contents {
+		result := &examples.Example{Path: c.Path}
+		err = manager.FindOne(result)
 		switch {
 		case err == mgo.ErrNotFound:
-			log.Printf("DEBUG: Doc %s not found.", content.Path)
-			example := &Example{}
-			example.Prepare(content)
-			example.Save()
+			// Example not found, create new one.
+			// log.Printf("DEBUG: Doc %s not found.", content.Path)
+			// TODO: Alternative to passing the repo around?
+			example, prerr := prepare(repo, c)
+			if prerr != nil {
+				return prerr
+			}
+			serr := manager.Insert(example)
+			if serr != nil {
+				return serr
+			}
 		case err != nil:
 			return err
-		case content.SHA != result.SHA:
-			log.Printf("DEBUG: Doc %s found, but needs updating.", content.Path)
-			example := &Example{}
-			example.Prepare(content)
-			example.UpdateByPath(content.Path)
+		case c.SHA != result.SHA:
+			// Example found, but content changed, update.
+			// log.Printf("DEBUG: Doc %s found, but needs updating.", content.Path)
+			example, prerr := prepare(repo, c)
+			if prerr != nil {
+				return prerr
+			}
+			serr := manager.Update(example)
+			if serr != nil {
+				return serr
+			}
 		default:
-			log.Printf("DEBUG: Doc %s found.", content.Path)
+			// Example found, do nothing.
+			// log.Printf("DEBUG: Doc %s found.", content.Path)
 		}
 	}
 

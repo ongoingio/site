@@ -18,6 +18,11 @@ import (
 	"net/http"
 )
 
+// The Fetcher interface is implemented by repositories to allow fetching of files and file content.
+type Fetcher interface {
+	Fetch(path string) (*Content, []*Content, error)
+}
+
 // Repository represents a Github repository.
 type Repository struct {
 	URL string
