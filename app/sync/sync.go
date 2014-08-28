@@ -37,7 +37,7 @@ func prepare(repo github.Fetcher, content *github.Content) (*examples.Example, e
 }
 
 // Sync synchronizes the database with the Github repository.
-func Sync(repo github.Fetcher, manager examples.RepositoryInterface) error {
+func Sync(manager examples.RepositoryInterface, repo github.Fetcher) error {
 	_, contents, err := repo.Fetch("/")
 	if err != nil {
 		return err
