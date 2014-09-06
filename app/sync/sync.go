@@ -1,3 +1,5 @@
+// Sync as a service coordinates the (one-way) synchronization of examples from Github to a local repository (data store).
+//
 // TODO: Ignore ignored files.
 // TODO: Handle folders (and symlinks?) differently.
 
@@ -12,7 +14,7 @@ import (
 	"github.com/ongoingio/site/app/github"
 )
 
-// TODO: Method on Examples or Example?
+// generateAlias takes a string and returns a URL-safe representation of it.
 func generateAlias(name string) string {
 	return url.QueryEscape(name)
 }
@@ -36,7 +38,7 @@ func prepare(repo github.Fetcher, content *github.Content) (*examples.Example, e
 	return example, nil
 }
 
-// Sync synchronizes the database with the Github repository.
+// Sync fetches examples from a remote repository and puts them into a local repository.
 func Sync(manager examples.RepositoryInterface, repo github.Fetcher) error {
 	_, contents, err := repo.Fetch("/")
 	if err != nil {

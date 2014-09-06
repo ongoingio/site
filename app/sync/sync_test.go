@@ -1,6 +1,3 @@
-// TODO: sync belongs to package github?
-// TODO: is sync an adapter?
-
 package sync
 
 import (
