@@ -1,13 +1,11 @@
-// Examples only needs the session.
-
 package examples
 
-//RepositoryInterface defines the interface
-type RepositoryInterface interface {
-	Store(example *Example) error
-	FindByAlias(example *Example) error
-	FindAll(examples *[]Example) error
-	UpdateByAlias(example *Example) error
+// Repository defines the interface to persist example entities.
+type Repository interface {
+	Store(e *Example) error
+	FindByAlias(e *Example) error
+	FindAll(e *[]Example) error
+	UpdateByAlias(e *Example) error
 }
 
 // Example represents an Example.
