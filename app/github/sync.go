@@ -3,7 +3,7 @@
 // TODO: Ignore ignored files.
 // TODO: Handle folders (and symlinks?) differently.
 
-package sync
+package github
 
 import (
 	"net/url"
@@ -11,7 +11,6 @@ import (
 	"gopkg.in/mgo.v2"
 
 	"github.com/ongoingio/site/app/examples"
-	"github.com/ongoingio/site/app/github"
 )
 
 // generateAlias takes a string and returns a URL-safe representation of it.
@@ -19,7 +18,7 @@ func generateAlias(name string) string {
 	return url.QueryEscape(name)
 }
 
-func prepare(repo github.Fetcher, content *github.Content) (*examples.Example, error) {
+func prepare(repo Fetcher, content *Content) (*examples.Example, error) {
 	example := &examples.Example{
 		Type:  content.Type,
 		Alias: generateAlias(content.Name),
@@ -39,7 +38,7 @@ func prepare(repo github.Fetcher, content *github.Content) (*examples.Example, e
 }
 
 // Sync fetches examples from a remote repository and puts them into a local repository.
-func Sync(manager examples.RepositoryInterface, repo github.Fetcher) error {
+func Sync(manager examples.RepositoryInterface, repo Fetcher) error {
 	_, contents, err := repo.Fetch("/")
 	if err != nil {
 		return err

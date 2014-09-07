@@ -7,22 +7,21 @@ import (
 	"gopkg.in/mgo.v2"
 
 	"github.com/ongoingio/site/app/examples"
-	"github.com/ongoingio/site/app/github"
 )
 
 type githubMock struct {
 	URL string
 }
 
-func (repo *githubMock) Fetch(path string) (*github.Content, []*github.Content, error) {
-	contentA := &github.Content{
+func (repo *githubMock) Fetch(path string) (*Content, []*Content, error) {
+	contentA := &Content{
 		Type:     "file",
 		Encoding: "base64",
 		Name:     "File A.md",
 		Path:     "File A.md",
 		SHA:      "123",
 	}
-	contentB := &github.Content{
+	contentB := &Content{
 		Type:     "file",
 		Encoding: "base64",
 		Name:     "File B.md",
@@ -31,7 +30,7 @@ func (repo *githubMock) Fetch(path string) (*github.Content, []*github.Content, 
 	}
 
 	if path == "/" {
-		contents := make([]*github.Content, 2)
+		contents := make([]*Content, 2)
 		contents[0] = contentA
 		contents[1] = contentB
 		return nil, contents, nil
