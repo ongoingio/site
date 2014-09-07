@@ -24,7 +24,7 @@ func connect() {
 	c = session.DB("ongoingio-test").C("examples")
 
 	err = c.DropCollection()
-	if err != nil {
+	if err != nil && err.Error() != "ns not found" {
 		panic(err)
 	}
 }
