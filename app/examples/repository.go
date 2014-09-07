@@ -37,5 +37,10 @@ func (r *Repository) FindAll(e *[]Example) error {
 }
 
 func (r *Repository) UpdateByAlias(e *Example) error {
+	err := r.Collection.Update(bson.M{"alias": e.Alias}, e)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }

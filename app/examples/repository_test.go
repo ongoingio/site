@@ -4,7 +4,6 @@ package examples
 
 import (
 	crand "crypto/rand"
-	_ "fmt"
 	mrand "math/rand"
 	"strconv"
 	"strings"
@@ -118,6 +117,35 @@ func TestFindAll(t *testing.T) {
 	}
 	if len(results) != 2 {
 		t.Fatalf("results len should be 2, is %v", len(results))
+	}
+}
+
+func TestUpdateByAlias(t *testing.T) {
+	connect()
+	e := generateExample()
+
+	err := c.Insert(&e)
+	if err != nil {
+		t.Fatalf("mgo err: %v", err)
+	}
+
+	e.Name = "Foobar"
+
+	repo := &Repository{Collection: c}
+
+	err = repo.UpdateByAlias(&e)
+	if err != nil {
+		t.Fatalf("UpdateByAlias err: %v", err)
+	}
+
+	result := &Example{}
+	err = c.Find(bson.M{"alias": e.Alias}).One(&result)
+	if err != nil {
+		t.Fatalf("mgo err: %v", err)
+	}
+
+	if result.Name != e.Name {
+		t.Fatalf("Name should be %s, is %s", e.Name, result.Name)
 	}
 }
 
