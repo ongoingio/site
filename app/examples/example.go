@@ -1,7 +1,7 @@
 package examples
 
 // Repository defines the interface to persist example entities.
-type Repository interface {
+type RepositoryInterface interface {
 	Store(e *Example) error
 	FindByAlias(e *Example) error
 	FindAll(e *[]Example) error

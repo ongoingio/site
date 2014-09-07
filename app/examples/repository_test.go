@@ -1,14 +1,12 @@
 // TODO: Tests require consecutive order. Make them independent.
 
-package repository
+package examples
 
 import (
 	"testing"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
-
-	"github.com/ongoingio/site/app/examples"
 )
 
 var c *mgo.Collection
@@ -31,15 +29,15 @@ func connect() {
 	}
 }
 
-func getExample() examples.Example {
-	return examples.Example{
+func getExample() Example {
+	return Example{
 		Name:        "Test",
 		Alias:       "test",
 		Type:        "file",
 		Path:        "test",
 		Description: "Foobar",
 		SHA:         "123",
-		Content:     []examples.Section{{Comment: "a", Code: "aa"}},
+		Content:     []Section{{Comment: "a", Code: "aa"}},
 	}
 }
 
@@ -50,7 +48,7 @@ func TestStore(t *testing.T) {
 	repo := &Repository{Collection: c}
 	repo.Store(&e)
 
-	result := examples.Example{}
+	result := Example{}
 	err := c.Find(bson.M{"alias": "test"}).One(&result)
 	if err != nil {
 		t.Fatalf("mgo err: %v", err)
@@ -71,7 +69,7 @@ func TestFindByAlias(t *testing.T) {
 	}
 
 	repo := &Repository{Collection: c}
-	result := &examples.Example{Alias: "test"}
+	result := &Example{Alias: "test"}
 	err = repo.FindByAlias(result)
 	if result.Name != "Test" {
 		t.Fatalf("name should be %s, is %s", "Test", result.Name)
@@ -81,7 +79,7 @@ func TestFindByAlias(t *testing.T) {
 func TestInterface(t *testing.T) {
 	repo := &Repository{}
 	var i interface{} = repo
-	if _, ok := i.(examples.Repository); ok == false {
+	if _, ok := i.(RepositoryInterface); ok == false {
 		t.Fatal("Repository does not fullfill the RepositoryInterface interface")
 	}
 }
