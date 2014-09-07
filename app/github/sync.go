@@ -28,16 +28,18 @@ func prepare(repo Fetcher, content *Content) (*examples.Example, error) {
 	}
 
 	// TODO: Prepare() in goroutine.
-	c, _, err := repo.Fetch(content.Path)
+	_, _, err := repo.Fetch(content.Path)
 	if err != nil {
 		return nil, err
 	}
-	example.Content = c.Content
+
+	// TODO: Parse content
+	//example.Content = c.Content
 
 	return example, nil
 }
 
-// Sync fetches examples from a remote repository and puts them into a local repository.
+// Sync fetches examples from a remote repository (interface) and puts them into a local storage repository (interface).
 func Sync(manager examples.RepositoryInterface, repo Fetcher) error {
 	_, contents, err := repo.Fetch("/")
 	if err != nil {
@@ -46,7 +48,7 @@ func Sync(manager examples.RepositoryInterface, repo Fetcher) error {
 
 	for _, c := range contents {
 		result := &examples.Example{Path: c.Path}
-		err = manager.FindOne(result)
+		err = manager.FindByAlias(result)
 		switch {
 		case err == mgo.ErrNotFound:
 			// Example not found, create new one.
@@ -56,7 +58,7 @@ func Sync(manager examples.RepositoryInterface, repo Fetcher) error {
 			if prerr != nil {
 				return prerr
 			}
-			serr := manager.Insert(example)
+			serr := manager.Store(example)
 			if serr != nil {
 				return serr
 			}
@@ -69,7 +71,7 @@ func Sync(manager examples.RepositoryInterface, repo Fetcher) error {
 			if prerr != nil {
 				return prerr
 			}
-			serr := manager.Update(example)
+			serr := manager.UpdateByAlias(example)
 			if serr != nil {
 				return serr
 			}

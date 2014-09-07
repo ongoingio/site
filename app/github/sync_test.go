@@ -1,4 +1,4 @@
-package sync
+package github
 
 import (
 	"fmt"
@@ -53,12 +53,12 @@ type exampleStore struct {
 	data []examples.Example
 }
 
-func (store *exampleStore) Insert(example *examples.Example) error {
+func (store *exampleStore) Store(example *examples.Example) error {
 	store.data = append(store.data, *example)
 	return nil
 }
 
-func (store *exampleStore) FindOne(example *examples.Example) error {
+func (store *exampleStore) FindByAlias(example *examples.Example) error {
 	for _, ex := range store.data {
 		if ex.Path == example.Path {
 			example = &ex
@@ -73,20 +73,10 @@ func (store *exampleStore) FindAll(examples *[]examples.Example) error {
 	return nil
 }
 
-func (store *exampleStore) Update(example *examples.Example) error {
+func (store *exampleStore) UpdateByAlias(example *examples.Example) error {
 	for i, ex := range store.data {
 		if ex.Path == example.Path {
 			store.data[i] = *example
-		}
-	}
-	return nil
-}
-
-func (store *exampleStore) Remove(example *examples.Example) error {
-	for i, ex := range store.data {
-		if ex.Path == example.Path {
-			// Delete index from slice.
-			store.data = append(store.data[:i], store.data[i+1:]...)
 		}
 	}
 	return nil
