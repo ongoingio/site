@@ -117,7 +117,7 @@ func TestFindAll(t *testing.T) {
 		t.Fatal("results should not be nil")
 	}
 	if len(results) != 2 {
-		t.Fatalf("results len should be 2, is %s", len(results))
+		t.Fatalf("results len should be 2, is %v", len(results))
 	}
 }
 
