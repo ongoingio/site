@@ -31,12 +31,20 @@ func connect() {
 	}
 }
 
+<<<<<<< HEAD
 func random(str_size int) string {
 	alphanum := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
 	var bytes = make([]byte, str_size)
 	crand.Read(bytes)
 	for i, b := range bytes {
 		bytes[i] = alphanum[b%byte(len(alphanum))]
+=======
+	c = session.DB("ongoingio-test").C("examples")
+
+	err = c.DropCollection()
+	if err != nil && err.Error() != "ns not found" {
+		panic(err)
+>>>>>>> origin/master
 	}
 	return string(bytes)
 }
