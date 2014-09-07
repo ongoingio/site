@@ -1,6 +1,5 @@
 // Repository package is a service to get content from a Github repository.
 //
-// TODO: Rename /repository to /services?
 // TODO: Could the repository just be another store/gateway? And sync an adapter between the two stores with the same interface?
 //
 // Usage:
@@ -16,6 +15,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/ongoingio/urljoin"
 )
 
 // The Fetcher interface is implemented by repositories to allow fetching of files and file content.
@@ -23,28 +24,28 @@ type Fetcher interface {
 	Fetch(path string) (*Content, []*Content, error)
 }
 
-// Repository represents a Github repository.
+// Repository represents a GitHub repository.
 type Repository struct {
 	URL string
 }
 
 // Content represents a content (file, dir, symlink) inside the repository.
 type Content struct {
-	Type     string `json:"type,omitempty"`
-	Encoding string `json:"encoding,omitempty"`
 	Name     string `json:"name,omitempty"`
 	Path     string `json:"path,omitempty"`
-	Content  string `json:"content,omitempty"`
 	SHA      string `json:"sha,omitempty"`
 	URL      string `json:"url,omitempty"`
+	Type     string `json:"type,omitempty"`
+	Content  string `json:"content,omitempty"`
+	Encoding string `json:"encoding,omitempty"`
 }
 
+// decode is a helper function to base64 decode a (content) string.
 func decode(content string) (string, error) {
 	c, err := base64.StdEncoding.DecodeString(content)
 	if err != nil {
 		return "", err
 	}
-
 	return string(c), nil
 }
 
@@ -54,8 +55,7 @@ func decode(content string) (string, error) {
 // differentiate between the two, both contents are returned although one is
 // always nil.
 func (repo *Repository) Fetch(path string) (*Content, []*Content, error) {
-	// TODO: Make sure to correctly (slash separators) construct a URL.
-	resp, err := http.Get(repo.URL + path)
+	resp, err := http.Get(urljoin.Join(repo.URL, path))
 	if err != nil {
 		return nil, nil, err
 	}
