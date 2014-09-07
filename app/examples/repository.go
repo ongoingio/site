@@ -28,6 +28,11 @@ func (r *Repository) FindByAlias(e *Example) error {
 }
 
 func (r *Repository) FindAll(e *[]Example) error {
+	err := r.Collection.Find(bson.M{}).All(e)
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 

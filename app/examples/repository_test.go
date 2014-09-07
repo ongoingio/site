@@ -3,6 +3,11 @@
 package examples
 
 import (
+	crand "crypto/rand"
+	_ "fmt"
+	mrand "math/rand"
+	"strconv"
+	"strings"
 	"testing"
 
 	"gopkg.in/mgo.v2"
@@ -12,56 +17,67 @@ import (
 var c *mgo.Collection
 
 func connect() {
-	if c != nil {
-		return
+	if c == nil {
+		session, err := mgo.Dial("localhost")
+		if err != nil {
+			panic(err)
+		}
+		c = session.DB("ongoingio-test").C("examples")
 	}
 
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err)
-	}
-
-	c = session.DB("ongoingio-test").C("examples")
-
-	err = c.DropCollection()
-	if err != nil {
+	err := c.DropCollection()
+	if err != nil && err.Error() != "ns not found" {
 		panic(err)
 	}
 }
 
-func getExample() Example {
+func random(str_size int) string {
+	alphanum := "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
+	var bytes = make([]byte, str_size)
+	crand.Read(bytes)
+	for i, b := range bytes {
+		bytes[i] = alphanum[b%byte(len(alphanum))]
+	}
+	return string(bytes)
+}
+
+func generateExample() Example {
+	r := random(8)
+	rl := strings.ToLower(r)
+	rn := strconv.Itoa(mrand.Int())
+
 	return Example{
-		Name:        "Test",
-		Alias:       "test",
+		Name:        r,
+		Alias:       rl,
 		Type:        "file",
-		Path:        "test",
+		Path:        rl,
 		Description: "Foobar",
-		SHA:         "123",
+		SHA:         rn,
 		Content:     []Section{{Comment: "a", Code: "aa"}},
 	}
 }
 
 func TestStore(t *testing.T) {
 	connect()
-	e := getExample()
+	e := generateExample()
 
 	repo := &Repository{Collection: c}
 	repo.Store(&e)
 
 	result := Example{}
-	err := c.Find(bson.M{"alias": "test"}).One(&result)
+	err := c.Find(bson.M{"alias": e.Alias}).One(&result)
 	if err != nil {
 		t.Fatalf("mgo err: %v", err)
 	}
 
-	if result.Name != "Test" {
-		t.Fatalf("name should be %s, is %s", "Test", result.Name)
+	if result.Name != e.Name {
+		t.Fatalf("name should be %s, is %s", e.Name, result.Name)
 	}
 }
 
 func TestFindByAlias(t *testing.T) {
 	connect()
-	e := getExample()
+	e := generateExample()
 
 	err := c.Insert(&e)
 	if err != nil {
@@ -69,10 +85,10 @@ func TestFindByAlias(t *testing.T) {
 	}
 
 	repo := &Repository{Collection: c}
-	result := &Example{Alias: "test"}
+	result := &Example{Alias: e.Alias}
 	err = repo.FindByAlias(result)
-	if result.Name != "Test" {
-		t.Fatalf("name should be %s, is %s", "Test", result.Name)
+	if result.Name != e.Name {
+		t.Fatalf("name should be %s, is %s", e.Name, result.Name)
 	}
 }
 
@@ -81,6 +97,27 @@ func TestInterface(t *testing.T) {
 	var i interface{} = repo
 	if _, ok := i.(RepositoryInterface); ok == false {
 		t.Fatal("Repository does not fullfill the RepositoryInterface interface")
+	}
+}
+
+func TestFindAll(t *testing.T) {
+	connect()
+	e1 := generateExample()
+	e2 := generateExample()
+
+	err := c.Insert(&e1, &e2)
+	if err != nil {
+		t.Fatalf("mgo err: %v", err)
+	}
+
+	repo := &Repository{Collection: c}
+	var results []Example
+	err = repo.FindAll(&results)
+	if results == nil {
+		t.Fatal("results should not be nil")
+	}
+	if len(results) != 2 {
+		t.Fatalf("results len should be 2, is %s", len(results))
 	}
 }
 
